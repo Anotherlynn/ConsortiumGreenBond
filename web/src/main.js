@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import './plugins/axios'
 import router from './router'
 import './plugins/element.js'
 /* 挂载全局应用容器 */

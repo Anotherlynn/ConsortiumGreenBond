@@ -1,9 +1,6 @@
 /*
-* 登录页面
-* Author: Maoqi he
-* time: 2020-02-10
+登陆界面
 */
-
 <template>
   <div class="login-container">
     <div class="login-box">
@@ -29,9 +26,7 @@
         <!-- 提交按钮 -->
         <div class="submit-area">
           <el-form-item class="submit-item">
-            <el-button class="submit" type="primary" @click="onLogin"
-              >登录</el-button
-            >
+            <el-button class="submit" type="primary" @click="onLogin">登录</el-button>
           </el-form-item>
           <el-form-item class="submit-item">
             <el-button class="submit" type="warning" @click="onRegister"
