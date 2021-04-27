@@ -4,6 +4,15 @@ import VueRouter from 'vue-router'
 import Login from '../views/Login.vue'
 import Test from '../views/test.vue'
 import Register from '../views/Register.vue'
+import User from '../views/User.vue'
+import Management from '../views/Management.vue'
+import UserManagement from '../views/usermanagement.vue'
+import Query from '../views/Query.vue'
+//import Detail from '../views/Detail.vue'
+import companyManagement from '../views/companyManagement.vue'
+import Transaction from '../views/Transaction.vue'
+import TransactionData from '../views/Transactiondata.vue'
+import marketMonitoring from '../views/Marketmonitoring.vue'
 Vue.use(VueRouter)
 
 const routes = [
@@ -22,6 +31,52 @@ const routes = [
     name: 'Register',
     component: Register
   },
+  {
+    path: '/user',
+    name: 'User',
+    component: User,
+    children: [
+      {
+        path: '/management',
+        name: 'Management',
+        component: Management
+      },
+      {
+        path: '/userManagement',
+        component: UserManagement
+      },
+      {
+        path: '/query',
+        name: 'query',
+        component: Query
+      },
+      // {
+      //   path: '/detail',
+      //   name: 'detail',
+      //   component: Detail
+      // }
+      {
+        path: '/companyManagement',
+        name: 'companyManagement',
+        component: companyManagement
+      },
+      {
+        path: '/transaction',
+        name: 'transaction',
+        component: Transaction
+      },
+      {
+        path: '/transactionData',
+        name: 'transactionData',
+        component: TransactionData
+      },
+      {
+        path: '/marketMonitoring',
+        name: 'marketMonitoring',
+        component: marketMonitoring
+      }
+    ]
+  }
   //{
     //path: '/about',
     //name: 'About',
