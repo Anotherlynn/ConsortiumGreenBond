@@ -3,14 +3,13 @@
 */
 <template>
   <div class="login-container">
-    <div class="login-box">
+    <el-card class = "login-card">
       <h1 class="title">欢迎使用联盟链<span>绿色债券</span>管理系统</h1>
-
       <!-- 登录表单 -->
       <el-form
         ref="loginForm"
         :model="form"
-        label-width="50px"
+        label-width="100px"
         :rules="formRules"
       >
         <!-- 账号 -->
@@ -35,7 +34,8 @@
           </el-form-item>
         </div>
       </el-form>
-    </div>
+    </el-card>
+
   </div>
 </template>
 
@@ -62,6 +62,16 @@ export default {
             return this.$message.error("登录失败，请重试");
           }
           // 将 token 存入 window.sessionStorage
+          /*
+          使用 sessionStorage 创建一个本地存储的 name/value 对
+          name="lastname" value="Smith"
+          然后检索 "lastname" 的值
+          并插入到 id="result" 的元素上:
+            // 存储
+            sessionStorage.setItem("lastname", "Smith");
+            // 检索
+            document.getElementById("result").innerHTML = sessionStorage.getItem("lastname");
+          */
           window.sessionStorage.setItem("token", response.data.token);
           // 判断用户是否为管理员
           if (this.form["用户id"] === "admin") {
@@ -126,5 +136,8 @@ h1 {
 .el-button {
   display: inline-block;
   width: 180px !important;
+}
+.el-card {
+  margin: auto
 }
 </style>

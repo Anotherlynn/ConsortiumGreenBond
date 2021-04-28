@@ -400,6 +400,4 @@ if (process.env.VCAP_APPLICATION) {
 //run app on port
 app.listen(port, function () {
     console.log('app running on port: %d', port);
-
-
 });

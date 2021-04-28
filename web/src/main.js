@@ -13,7 +13,7 @@ import axios from 'axios'
 Vue.prototype.$echarts = echarts
 // 将 axios 绑定到全局对象的 prototype 上, 所有组件均可通过 `this.$http` 访问 axios 对象
 Vue.prototype.$http = axios
-// axios 配置请
+// axios 配置
 axios.defaults.baseURL = 'http://localhost:9000'
 
 Vue.config.productionTip = false
