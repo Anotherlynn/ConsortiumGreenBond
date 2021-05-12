@@ -1,0 +1,43 @@
+{
+    "certificateAuthorities": {
+        "supervisorca-api.127-0-0-1.nip.io:39600": {
+            "url": "http://supervisorca-api.127-0-0-1.nip.io:39600"
+        }
+    },
+    "client": {
+        "connection": {
+            "timeout": {
+                "orderer": "300",
+                "peer": {
+                    "endorser": "300"
+                }
+            }
+        },
+        "organization": "supervisor"
+    },
+    "display_name": "supervisor Gateway",
+    "id": "supervisorgateway",
+    "name": "supervisor Gateway",
+    "organizations": {
+        "supervisor": {
+            "certificateAuthorities": [
+                "supervisorca-api.127-0-0-1.nip.io:39600"
+            ],
+            "mspid": "supervisorMSP",
+            "peers": [
+                "supervisorpeer-api.127-0-0-1.nip.io:39600"
+            ]
+        }
+    },
+    "peers": {
+        "supervisorpeer-api.127-0-0-1.nip.io:39600": {
+            "grpcOptions": {
+                "grpc.default_authority": "supervisorpeer-api.127-0-0-1.nip.io:39600",
+                "grpc.ssl_target_name_override": "supervisorpeer-api.127-0-0-1.nip.io"
+            },
+            "url": "grpc://supervisorpeer-api.127-0-0-1.nip.io:39600"
+        }
+    },
+    "type": "gateway",
+    "version": "1.0"
+}

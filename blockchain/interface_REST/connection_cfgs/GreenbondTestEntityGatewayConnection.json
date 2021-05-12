@@ -1,0 +1,43 @@
+{
+    "certificateAuthorities": {
+        "entityca-api.127-0-0-1.nip.io:39600": {
+            "url": "http://entityca-api.127-0-0-1.nip.io:39600"
+        }
+    },
+    "client": {
+        "connection": {
+            "timeout": {
+                "orderer": "300",
+                "peer": {
+                    "endorser": "300"
+                }
+            }
+        },
+        "organization": "entity"
+    },
+    "display_name": "entity Gateway",
+    "id": "entitygateway",
+    "name": "entity Gateway",
+    "organizations": {
+        "entity": {
+            "certificateAuthorities": [
+                "entityca-api.127-0-0-1.nip.io:39600"
+            ],
+            "mspid": "entityMSP",
+            "peers": [
+                "entitypeer-api.127-0-0-1.nip.io:39600"
+            ]
+        }
+    },
+    "peers": {
+        "entitypeer-api.127-0-0-1.nip.io:39600": {
+            "grpcOptions": {
+                "grpc.default_authority": "entitypeer-api.127-0-0-1.nip.io:39600",
+                "grpc.ssl_target_name_override": "entitypeer-api.127-0-0-1.nip.io"
+            },
+            "url": "grpc://entitypeer-api.127-0-0-1.nip.io:39600"
+        }
+    },
+    "type": "gateway",
+    "version": "1.0"
+}
