@@ -1,4 +1,4 @@
-function CreateGreenBond(
+export function CreateGreenBond(
     _BondId = 10000,
     _BondProp1 = '',
     _BondProp2 = '',
