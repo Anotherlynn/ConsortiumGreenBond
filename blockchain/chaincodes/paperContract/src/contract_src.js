@@ -35,29 +35,15 @@ class GreenBondContract extends Contract
         {
             throw new Error(`绿色债券 ${BondId} 已经存在了，不能重复创建`);
         }
-        if (typeof objstr !== 'string')
-        {
-            throw new Error('objstr的类型应该是stringnify之后的字符串');
-        }
-        //const asset = JSON.parse(obj_string);
-        let temp_obj;
-        try
-        {
-            temp_obj = JSON.parse(objstr);
-        }
-        catch (e)
-        {
-            throw new Error('没办法解析objstr,考虑输入的东西是否严格是obj stringnify之后的东西');
-        }
-        const buffer = Buffer.from(JSON.stringify(temp_obj));
+        const buffer = Buffer.from(objstr);
         await ctx.stub.putState(BondId, buffer);
-        return true;//注册成功后返回true给caller.
+        return true;//创建成功后返回true给caller.
     }
     /**
      * 读取债券的详细信息
      * @param {Context} ctx 接口对象
      * @param {String} BondId 唯一标识符
-     * @returns {Object} 将会返回一个Object债券详细信息对象，查不到的话抛出错误
+     * @returns {Object} 将会返回一个Stringified Object债券详细信息对象，查不到的话抛出错误
      */
     async readBond(ctx, BondId)
     {
@@ -67,7 +53,7 @@ class GreenBondContract extends Contract
             throw new Error(`根据提供的BondID:${BondId}，查询并不存在`);
         }
         const buffer = await ctx.stub.getState(BondId);
-        const asset = JSON.parse(buffer.toString());
+        const asset = buffer.toString();
         return asset;
     }
     /**
@@ -83,21 +69,7 @@ class GreenBondContract extends Contract
         {
             throw new Error(`绿色债券 ${BondId} 并不存在，改不了`);
         }
-        if (typeof objstr !== 'string')
-        {
-            throw new Error('objstr的类型应该是stringnify之后的字符串');
-        }
-        //const asset = JSON.parse(obj_string);
-        let temp_obj;
-        try
-        {
-            temp_obj = JSON.parse(objstr);
-        }
-        catch (e)
-        {
-            throw new Error('没办法解析objstr,考虑输入的东西是否严格是obj stringnify之后的东西');
-        }
-        const buffer = Buffer.from(JSON.stringify(temp_obj));
+        const buffer = Buffer.from(objstr);
         await ctx.stub.putState(BondId, buffer);
         return true;//修改成功后返回true给caller.
     }

@@ -1,5 +1,5 @@
 {
-  "name": "green_bond_contract",
+  "name": "greenbond_contract",
   "version": "0.0.2",
   "description": "provide user register and login etc. services.",
   "main": "index.js",

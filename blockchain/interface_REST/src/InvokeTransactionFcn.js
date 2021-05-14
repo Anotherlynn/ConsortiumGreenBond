@@ -3,7 +3,8 @@ const GlobalVars = require('../global_vars.js');
 const path = require('path');
 const NetWorkName = GlobalVars.NetWorkName;
 const { Wallets, Gateway } = require('fabric-network');
-const { EnrollAdminFull, IsUserRegisteredByWallet} = require('./controller');
+const { EnrollAdminFull} = require('./controller');
+const { IsUserRegisteredByWallet } = require('./walletutil');
 exports.InvokeTransaction = async (ChannelName, ChaincodeName, fcn, args, ActorName, ActorOrganizationName) =>
 {
     try
@@ -83,6 +84,46 @@ exports.InvokeTransaction = async (ChannelName, ChaincodeName, fcn, args, ActorN
             {
                 result = await contract.submitTransaction(fcn, args[0], args[1], args[2]);
                 message = "用户登录";
+            }
+            if (fcn === "BondExists")
+            {
+                result = await contract.submitTransaction(fcn, args[0]);
+                message = "查询债券是否存在";
+            }
+            if (fcn === "CreateBondWithObj")
+            {
+                result = await contract.submitTransaction(fcn, args[0], args[1]);
+                message = "根据债券id设置详细信息";
+            }
+            if (fcn === "readBond")
+            {
+                result = await contract.submitTransaction(fcn, args[0]);
+                message = "根据债券id读取详细信息";
+            }
+            if (fcn === "updateBond")
+            {
+                result = await contract.submitTransaction(fcn, args[0], args[1]);
+                message = "根据bondid和详细信息更新债券信息";
+            }
+            if (fcn === "deleteBond")
+            {
+                result = await contract.submitTransaction(fcn, args[0]);
+                message = "根据bondid删除债券信息";
+            }
+            if(fcn === "queryAllAssets_by_range")
+            {
+                result = await contract.submitTransaction(fcn, args[0], args[1]);
+                message = "根据起始键和结束键返回查询结果";
+            }
+            if(fcn === "queryHistorybykey")
+            {
+                result = await contract.submitTransaction(fcn, args[0]);
+                message = "查询债券的变更记录";
+            }
+            if(fcn === "getQueryResultForQueryString")
+            {
+                result = await contract.submitTransaction(fcn, args[0]);
+                message = "根据mango的查询语句富查询";
             }
                 let response =
                 {
