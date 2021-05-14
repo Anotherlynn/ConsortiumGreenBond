@@ -3,9 +3,9 @@ const GlobalVars = require('../global_vars.js');
 const path = require('path');
 const NetWorkName = GlobalVars.NetWorkName;
 const { Wallets, Gateway } = require('fabric-network');
-const { EnrollAdminFull } = require('./controller');
+//const { EnrollAdminFull } = require('./controller');
 
-exports.InvokeTransaction = async (ChannelName, ChaincodeName, fcn, args, ActorName, ActorActorOrganizationName) =>
+exports.InvokeTransaction = async (ChannelName, ChaincodeName, fcn, args, ActorName, ActorOrganizationName) =>
 {
     try
     {
@@ -62,7 +62,9 @@ exports.InvokeTransaction = async (ChannelName, ChaincodeName, fcn, args, ActorN
             }
             if (fcn === "GetUserDetail")
             {
-                
+                result = await contract.submitTransaction(fcn, args[0]);
+                message = "获得用户详细信息";
+
             }
                 let response =
                 {

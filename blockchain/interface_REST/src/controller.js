@@ -72,6 +72,10 @@ exports.SetUserDetail = async (UserName, StringifiedString) =>
     const response = InvokeTransaction(CHANNELNAME, 'user_contract', 'SetUsetDetail', [UserName, StringifiedString], 'admin', 'system_admin');
     return response.result;
 }
+exports.GetUserDatail = async (UserName) =>
+{
+    
+}
 exports.RegisterUserBoth = async (UserName, UserPassword, OrganizationName) =>
 {
     await this.RegisterUserOnBlockchain(UserName, UserPassword, 'system_admin');
