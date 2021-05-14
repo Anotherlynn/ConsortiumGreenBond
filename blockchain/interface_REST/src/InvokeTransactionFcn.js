@@ -3,14 +3,23 @@ const GlobalVars = require('../global_vars.js');
 const path = require('path');
 const NetWorkName = GlobalVars.NetWorkName;
 const { Wallets, Gateway } = require('fabric-network');
-//const { EnrollAdminFull } = require('./controller');
-
+const { EnrollAdminFull, IsUserRegisteredByWallet} = require('./controller');
 exports.InvokeTransaction = async (ChannelName, ChaincodeName, fcn, args, ActorName, ActorOrganizationName) =>
 {
     try
     {
         //logger.debug(util.format('\n============ invoke transaction on channel %s ============\n', channelName));
-
+        // if (ActorName === 'admin')
+        // {
+            
+        // }
+        if (ActorName === 'admin' && ActorOrganizationName === 'systemadmin')
+        {
+            if (!IsUserRegisteredByWallet('admin', 'systemadmin'))
+            {
+                await EnrollAdminFull('systemadmin');
+            }
+        }
         const OrgNameLower = ActorOrganizationName.toLowerCase();
         //const FirstHighOthersLowOrgName = ActorOrganizationName[0].toUpperCase() + (ActorOrganizationName.substring(1)).toLowerCase();
         const WalletPathName = OrgNameLower + '_wallets';

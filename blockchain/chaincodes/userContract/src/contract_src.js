@@ -5,7 +5,7 @@
 在这里实现用户注册和登录的接口
 把注册登录-用户详细信息表分开，因为目前密码是必填项，详细信息可以且着
 注意，Fabric按照organizatio管理组织，所以用户的主键是name.org
-org只有三种取值['system-admin', 'supervisor', 'entity']，区分大小写
+org只有三种取值['systemadmin', 'supervisor', 'entity']，区分大小写
 思路：详细信息当对象存储，不再区块链上数据建模了。
 直接定义一个rich query接口
 用户名区分大小写
@@ -43,6 +43,14 @@ class UserContract extends Contract
         await ctx.stub.putState(UserId, buffer);
         return true;
     }
+    /**
+     * 
+     * @param {*} ctx 
+     * @param {*} name 
+     * @param {*} org 
+     * @param {*} psw 
+     * @returns 
+     */
     async UserLogin(ctx, name, org, psw)
     {
         const UserId = userpw_table_prefix + name + '.' + org;
