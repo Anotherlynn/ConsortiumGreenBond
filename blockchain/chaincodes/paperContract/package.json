@@ -1,6 +1,6 @@
 {
-  "name": "paper_contract",
-  "version": "0.0.1",
+  "name": "green_bond_contract",
+  "version": "0.0.2",
   "description": "provide user register and login etc. services.",
   "main": "index.js",
   "engines": {
@@ -14,7 +14,7 @@
     "start": "fabric-chaincode-node start"
   },
   "engineStrict": true,
-  "author": "John Doe",
+  "author": "Donia Hakurei",
   "license": "Apache-2.0",
   "dependencies": {
     "eslint": "^7.26.0",
