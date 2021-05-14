@@ -47,24 +47,33 @@ exports.InvokeTransaction = async (ChannelName, ChaincodeName, fcn, args, ActorN
 
             if (fcn === "UserRegister")
             {
-                result = await contract.submitTransaction(fcn, args[0], args[1]);
+                result = await contract.submitTransaction(fcn, args[0], args[1], args[2]);
                 message = "注册用户";
             }
             if (fcn === "UserExists")
             {
-                result = await contract.submitTransaction(fcn, args[0]);
+                result = await contract.submitTransaction(fcn, args[0], args[1]);
                 message = "检查用户是否存在"
             }
             if (fcn === "SetUserDetail")
             {
-                result = await contract.submitTransaction(fcn, args[0], args[1]);
+                result = await contract.submitTransaction(fcn, args[0], args[1], args[2]);
                 message = "设置用户详细信息";
             }
             if (fcn === "GetUserDetail")
             {
-                result = await contract.submitTransaction(fcn, args[0]);
+                result = await contract.submitTransaction(fcn, args[0], args[1]);
                 message = "获得用户详细信息";
-
+            }
+            if (fcn === "QueryUserByString")
+            {
+                result = await contract.submitTransaction(fcn, args[0]);
+                message = "用户富查询";
+            }
+            if (fcn === "UserLogin")
+            {
+                result = await contract.submitTransaction(fcn, args[0], args[1], args[2]);
+                message = "用户登录";
             }
                 let response =
                 {

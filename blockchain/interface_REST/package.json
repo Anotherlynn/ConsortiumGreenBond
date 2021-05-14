@@ -27,5 +27,8 @@
     "npm": "^6.14.6",
     "pkcs11js": "^1.2.2",
     "save": "^2.4.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.26.0"
   }
 }
