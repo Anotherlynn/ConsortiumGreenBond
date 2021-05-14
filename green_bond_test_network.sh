@@ -1,7 +1,7 @@
 #注意，当前情形下的domain_name为"127-0-0-1.nip.io"
 #默认的order organization名字是orderer
-#注意要在linux发布，windows发布后网络问题很迷惑
-#windows的dockers不知道把容器发布在哪个ip了，很烦，因此全栈在ubuntu上进行。
+#注意要在linux发布，windows的docker不知道把网卡弄成什么样子
+#很烦，因此全栈在ubuntu上进行。
 export MICROFAB_CONFIG='{
     "port": 39600,
     "endorsing_organizations":[

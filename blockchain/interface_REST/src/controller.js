@@ -1,186 +1,99 @@
 'use strict';
-const log4js = require('log4js');
-const logger = log4js.getLogger('BasicNetwork');
+//const log4js = require('log4js');
+//const logger = log4js.getLogger('BasicNetwork');
 //const bodyParser = require('body-parser');
-const util = require('util');
+//const util = require('util');
 //const fs = require('fs');
 const path = require('path');
 //const yaml = require('js-yaml');
-const { Gateway, Wallets } = require('fabric-network');
+const { Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
 const { buildCAClient, registerAndEnrollUser, enrollAdmin } = require('./CAUtil');
-const { buildCCP, buildWallet } = require('./AppUtil');
-let mspID;
-
-logger.level = 'debug';
-
-exports.RegisterUser = async (userID, organizationName) => {
-
-    //const orgName = organizationName.toLowerCase()+'.vrs.com';
-    //const ccpName = 'connection-profile-'+organizationName.toLowerCase()+'.json';
-    //const caName = 'ca.'+organizationName.toLowerCase()+'.vrs.com';
-    const ccpName = 'GreenbondTest' + organizationName[0].toUpperCase() + (organizationName.substring(1)).toLowerCase() + 'GatewayConnection.json'
-    const orgName = organizationName.toLowerCase();
-    //const ccpName = 'connection.json';
-    const caName = orgName + 'ca-api.127-0-0-1.nip.io:39600';
-    const ccp = buildCCP(orgName, ccpName);
-    const caClient = buildCAClient(FabricCAServices, ccp, caName);
-    //const walletPath = path.join(__dirname, 'wallet-'+organizationName.toLowerCase());
-    const pathName = orgName + '_wallets';
-    const walletPath = path.resolve(__dirname, '..', 'wallets', pathName)
-
-    console.log(`walletpath is ${walletPath}`)
-    const wallet = await buildWallet(Wallets, walletPath);
-
-    // if(organizationName.toLowerCase() == "manufacturer"){
-    //     mspID = "ManufacturerMSP";
-    // }else if(organizationName.toLowerCase() == "dealer"){
-    //     mspID = "DealerMSP";
-    // }else if(organizationName.toLowerCase() == "excise"){
-    //     mspID = "ExciseMSP";
-    // }else{
-    //     throw new Error(`no such MSP found: ${organizationName.toLowerCase()}`);
-    // }
-    // mspID = 'Org1MSP'
-    mspID = orgName + 'MSP'
+const { BuildConnectionFile, buildWallet } = require('./AppUtil');
+const { InvokeTransaction } = require('./InvokeTransactionFcn.js');
+const GlobalVars = require('../global_vars.js');
+const NetWorkName = GlobalVars.NetWorkName;
+const CHANNELNAME = GlobalVars.Channel;
+//logger.level = 'debug';
+exports.EnrollAdminFull = async (OrganizationName) =>
+{
+    const OrgNameLower = OrganizationName.toLowerCase();
+    const WalletPathName = OrgNameLower + '_wallets';
+    const WalletPathString = path.resolve(__dirname, '..', 'wallets', WalletPathName);
+    const wallet = await buildWallet(Wallets, WalletPathString);//基于文件系统的钱包文件
+    const ConnectionConfigFileName = NetWorkName + OrganizationName[0].toUpperCase() + (OrganizationName.substring(1)).toLowerCase() + 'GatewayConnection.json'//注意只是文件名
+    const CAName = OrgNameLower + 'ca-api.127-0-0-1.nip.io:39600';
+    const ConnectionConfigFile = BuildConnectionFile(OrgNameLower, ConnectionConfigFileName);
+    const caClient = buildCAClient(FabricCAServices, ConnectionConfigFile, CAName);
+    const mspID = OrganizationName[0].toUpperCase() + (OrganizationName.substring(1)).toLowerCase() + 'MSP';
     await enrollAdmin(caClient, wallet, mspID);
-    await registerAndEnrollUser(caClient, wallet, mspID, userID);
-    var response = {
+}
+exports.RegisterUserOnWallet = async (UserName, OrganizationName) =>
+{
+    const ConnectionConfigFileName = NetWorkName + OrganizationName[0].toUpperCase() + (OrganizationName.substring(1)).toLowerCase() + 'GatewayConnection.json'//注意只是文件名
+    const OrgNameLower = OrganizationName.toLowerCase();
+    const CAName = OrgNameLower + 'ca-api.127-0-0-1.nip.io:39600';
+    const ConnectionConfigFile = BuildConnectionFile(OrgNameLower, ConnectionConfigFileName);
+    const caClient = buildCAClient(FabricCAServices, ConnectionConfigFile, CAName);
+    const WalletPathName = OrgNameLower + '_wallets';
+    const WalletPathString = path.resolve(__dirname, '..', 'wallets', WalletPathName);
+    const wallet = await buildWallet(Wallets, WalletPathString);//基于文件系统的钱包文件
+    console.log(`用户${UserName}的钱包应属路径是${WalletPathString},注意尚不知道文件钱包是否存在`);
+    const mspID = OrganizationName[0].toUpperCase() + (OrganizationName.substring(1)).toLowerCase() + 'MSP';
+    await enrollAdmin(caClient, wallet, mspID);
+    await registerAndEnrollUser(caClient, wallet, mspID, UserName);
+    var response =
+    {
         success: true,
-        message: userID + ' enrolled Successfully',
+        message: UserName + ' enrolled Successfully',
     };
     return response;
-
 }
-
-exports.isUserRegistered = async (userID, organizationName) => {
-
-    const walletPath = path.join(__dirname, 'wallet-' + organizationName.toLowerCase());
+/**
+ * 采用用户希望注册组织的CA Admin在链上注册信息
+ * @param {String} UserName 用户名
+ * @param {String} OrganizationName 组织名称
+ */
+exports.RegisterUserOnBlockchain = async (UserName, UserPassword) =>
+{
+    await this.EnrollAdminFull('system_admin');//如果没有admin用户的话就注册一个在钱包里,不然下一行不能执行
+    const response = await InvokeTransaction(CHANNELNAME, 'user_contract', 'UserRegister', [UserName, UserPassword], 'admin', 'system_admin');
+    return response.result;
+}
+exports.IsUserExist = async (UserName) =>
+{
+    await this.EnrollAdminFull('system_admin');//如果没有admin用户的话就注册一个在钱包里,不然下一行不能执行
+    const response = InvokeTransaction(CHANNELNAME, 'user_contract', 'UserExists', [UserName], 'admin', 'system_admin');
+    return response.result;
+}
+exports.SetUserDetail = async (UserName, StringifiedString) =>
+{
+    await this.EnrollAdminFull('system_admin');//如果没有admin用户的话就注册一个在钱包里,不然下一行不能执行
+    const response = InvokeTransaction(CHANNELNAME, 'user_contract', 'SetUsetDetail', [UserName, StringifiedString], 'admin', 'system_admin');
+    return response.result;
+}
+exports.RegisterUserBoth = async (UserName, UserPassword, OrganizationName) =>
+{
+    await this.RegisterUserOnBlockchain(UserName, UserPassword, 'system_admin');
+    await this.RegisterUserOnWallet(UserName, OrganizationName);
+}
+/**
+ * 采用区块链钱包文件系统判断用户是否存在。注意，在Fabric框架中允许在不同组织的两个人同名。
+ * 因此该逻辑不宜后续采用
+ * @param {String} UserName 用户名
+ * @param {组织信息} OrganizationName 组织名称
+ * @returns 
+ */
+exports.IsUserRegisteredByWallet = async (UserName, OrganizationName) =>
+{
+    const walletPath = path.join(__dirname, 'wallet-' + OrganizationName.toLowerCase());
     const wallet = await buildWallet(Wallets, walletPath);
-
-    const userIdentity = await wallet.get(userID);
-    if (userIdentity) {
-        console.log(`An identity for the user ${userID} exists in the wallet`);
+    const UserNameentity = await wallet.get(UserName);
+    if (UserNameentity)
+    {
+        console.log(`An identity for the user ${UserName} exists in the wallet`);
         return true;
     }
     return false;
 }
 
-exports.invokeTransaction = async (channelName, chaincodeName, fcn, args, userID, organizationName) => {
-    try {
-        logger.debug(util.format('\n============ invoke transaction on channel %s ============\n', channelName));
-
-        const orgName = organizationName.toLowerCase() + '.vrs.com';
-        const ccpName = 'connection-profile-' + organizationName.toLowerCase() + '.json';
-        const ccp = buildCCP(orgName, ccpName);
-
-        // Create a new file system based wallet for managing identities.
-        const walletPath = path.join(__dirname, 'wallet-' + organizationName.toLowerCase());
-        const wallet = await buildWallet(Wallets, walletPath);
-
-        // Check to see if we've already enrolled the user.
-        let identity = await wallet.get(userID);
-        if (!identity) {
-            console.log(`An identity for the user ${userID} does not exist in the wallet`);
-            throw new Error(`No such Identity found in Wallet : ${userID.toLowerCase()}`);
-        }
-        const connectOptions = {
-            wallet,
-            identity: userID,
-            discovery: { enabled: true, asLocalhost: true },
-        }
-        const gateway = new Gateway();
-
-        try {
-
-            await gateway.connect(ccp, connectOptions);
-
-            const network = await gateway.getNetwork(channelName);
-            const contract = network.getContract(chaincodeName);
-
-            let result;
-            let message;
-            if (fcn === "CreateVehical") {
-                await contract.submitTransaction(fcn, args[0], args[1], args[2], args[3], args[4], args[5]);
-                message = `Successfully added the vehical asset with key ${args[0]}`;
-                let response = {
-                    message: message,
-                }
-                return response;
-            }
-            if (fcn === "DeleteVehical") {
-                await contract.submitTransaction(fcn, args[0]);
-                message = `Successfully deleted the vehical asset with key ${args[0]}`;
-            }
-            if (fcn === "ReadAsset") {
-                result = await contract.evaluateTransaction(fcn, args[0]);
-                message = `Successfully Get the vehical asset with key ${args[0]}`;
-            }
-            if (fcn === "TransferToDealer") {
-                await contract.submitTransaction(fcn, args[0], args[1]);
-                message = `Successfully transfer the vehical asset from Manufacturer to Dealer with key ${args[0]}`;
-            }
-            if (fcn === "ReceiveFromManufacturer") {
-                result = await contract.submitTransaction(fcn, args[0]);
-                message = `Successfully receive the vehical asset from Manufacturer to Dealer with key ${args[0]}`;
-            }
-            if (fcn === "TransferToOwner") {
-                await contract.submitTransaction(fcn, args[0], args[1], args[2], args[3], args[4], args[5]);
-                message = `Successfully transfer the vehical asset from Dealer to Owner with key ${args[0]}`;
-            }
-            if (fcn === "ReceiveFromDealer") {
-                await contract.submitTransaction(fcn, args[0]);
-                message = `Successfully receive the vehical asset from Dealer to Owner with key ${args[0]}`;
-            }
-            if (fcn === "ChangeOwner") {
-                await contract.submitTransaction(fcn, args[0], args[1], args[2], args[3], args[4]);
-                message = `Successfully transfer the vehical asset from Previous Owner to New Owner with key ${args[0]}`;
-            }
-            if (fcn === "ReceiveFromOwner") {
-                await contract.submitTransaction(fcn, args[0]);
-                message = `Successfully receive the vehical asset from Previous Owner to New Owner with key ${args[0]}`;
-            }
-            if (fcn === "QueryAssetsByOwner") {
-                result = await contract.evaluateTransaction(fcn, args[0]);
-                message = `Query Asset by engine number : ${args[0]}`;
-            }
-            if (fcn === "GetAssetHistory") {
-                result = await contract.evaluateTransaction(fcn, args[0]);
-                message = `Get VehicalAsset History by ID : ${args[0]}`;
-            }
-            if (fcn === "AssetExists") {
-                result = await contract.evaluateTransaction(fcn, args[0]);
-                message = `Check If Asset exist with the ID : ${args[0]}`;
-            }
-            if (fcn === "GetAllAssets") {
-                result = await contract.evaluateTransaction(fcn);
-                message = `Get All the Vehical Asset exist`;
-            }
-            if (fcn === "GetQueryResultForQueryString") {
-                result = await contract.evaluateTransaction(fcn, args[0]);
-                message = `Get  GetQueryResultForQueryString`;
-            }
-            // result = JSON.parse(result.toString());
-            let response = {
-                message: message,
-                result
-            }
-            return response;
-
-        } finally {
-            gateway.disconnect();
-        }
-    } catch (error) {
-
-        console.log(`Getting error: ${error}`)
-
-        // return error.message
-        let response = {
-            status: 404,
-            'content': 'Error catch',
-            'error': error,
-        }
-        return response;
-
-    }
-}
