@@ -14,6 +14,7 @@ const { buildCAClient, registerAndEnrollUser, enrollAdmin } = require('./CAUtil'
 const { BuildConnectionFile, buildWallet } = require('./AppUtil');
 const { InvokeTransaction } = require('./InvokeTransactionFcn.js');
 const GlobalVars = require('../global_vars.js');
+//const { response } = require('express');
 const NetWorkName = GlobalVars.NetWorkName;
 const CHANNELNAME = GlobalVars.Channel;
 //logger.level = 'debug';
@@ -84,10 +85,10 @@ exports.RegisterUserOnBlockchain = async (UserName, UserOrg, UserPassword) =>
  */
  exports.RegisterUserBoth = async (UserName, UserOrg, UserPassword) =>
  {
-     if (this.IsUserExist(UserName, UserOrg))
-     {
-         throw new Error(`用户${UserName}.${UserOrg}已经存在了,不能重复注册`);
-     }
+    //  if (this.IsUserExist(UserName, UserOrg))
+    //  {
+    //      throw new Error(`用户${UserName}.${UserOrg}已经存在了,不能重复注册`);
+    //  }
      await this.RegisterUserOnBlockchain(UserName, UserOrg, UserPassword);
      await this.RegisterUserOnWallet(UserName, UserOrg);
      return true;
@@ -107,10 +108,10 @@ exports.RegisterUserOnBlockchain = async (UserName, UserOrg, UserPassword) =>
  */
 exports.UserLogin = async (UserName, UserOrg, psw) =>
 {
-    if (!this.IsUserExist(UserName, UserOrg))
-    {
-        throw new Error(`用户${UserName}.${UserOrg}不存在，不能登录`);
-    }
+    // if (!this.IsUserExist(UserName, UserOrg))
+    // {
+    //     throw new Error(`用户${UserName}.${UserOrg}不存在，不能登录`);
+    // }
     const response = await InvokeTransaction(CHANNELNAME, 'user_contract', 'UserLogin', [UserName, UserOrg, psw], 'admin', 'systemadmin');
     return response.result;
 }
@@ -155,10 +156,10 @@ exports.SetUserDetail = async (UserName, UserOrg, StringifiedString, Actor = 'ad
  */
 exports.GetUserDatail = async (UserName, UserOrg, Actor = 'admin', ActorOrg = 'systemadmin') =>
 {
-    if (!this.IsUserExist(UserName, UserOrg))
-    {
-        throw new Error(`用户${UserName}.${UserOrg}不存在,不能获得信息`);
-    }
+    // if (!this.IsUserExist(UserName, UserOrg))
+    // {
+    //     throw new Error(`用户${UserName}.${UserOrg}不存在,不能获得信息`);
+    // }
     const response = InvokeTransaction(CHANNELNAME, 'user_contract', 'GetUserDetail', [UserName, UserOrg], Actor, ActorOrg);
     return response.result;
 }
@@ -176,26 +177,103 @@ exports.QueryUserByString = async (QueryString, Actor = 'admin', ActorOrg = 'sys
     return response.result;
 }
 
-/**
- * 采用区块链钱包文件系统判断用户是否存在。注意，在Fabric框架中允许在不同组织的两个人同名。
- * 因此该逻辑不宜后续采用
- * 该接口可暂时不管
- * @param {String} UserName 用户名
- * @param {组织信息} OrganizationName 组织名称
- * @returns 
- */
-exports.IsUserRegisteredByWallet = async (UserName, OrganizationName) =>
-{
-    const OrgNameLower = OrganizationName.toLowerCase();
-    const WalletPathName = OrgNameLower + '_wallets';
-    const WalletPathString = path.resolve(__dirname, '..', 'wallets', WalletPathName);
-    const wallet = await buildWallet(Wallets, WalletPathString);
-    const UserNameentity = await wallet.get(UserName);
-    if (UserNameentity)
-    {
-        console.log(`An identity for the user ${UserName} exists in the wallet`);
-        return true;
-    }
-    return false;
-}
 
+/**
+ * 
+ * @param {String} BondId 债券的唯一标识符
+ * @param {String} Actor 发起者
+ * @param {String} ActorOrg 用户所属组织，注意这个东西只有三种取值情形['systemadmin','entity','supervisor']
+ * @returns {Boolean} 是否存在的布尔值
+ */
+exports.BondExists = async (BondId, Actor = 'admin', ActorOrg = 'systemadmin') =>
+{
+    const response = InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'BondExists', [BondId], Actor, ActorOrg);
+    return response.result;
+}
+/**
+ * 
+ * @param {String} BondId 债券的唯一标识符
+ * @param {string} ObjStr stringified之后的债券详细信息对象
+ * @param {String} Actor 发起者
+ * @param {String} ActorOrg 用户所属组织，注意这个东西只有三种取值情形['systemadmin','entity','supervisor']
+ * @returns {Boolean} 创建成功则返回true
+ */
+exports.CreateBondWithObj = async (BondId, ObjStr, Actor = 'admin', ActorOrg = 'systemadmin') =>
+{
+    const response = InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'createBondWithObj', [BondId, ObjStr], Actor, ActorOrg);
+    return response.result;
+}
+/**
+ * 
+ * @param {String} BondId 债券的唯一标识符
+ * @param {String} Actor 发起者
+ * @param {String} ActorOrg 用户所属组织，注意这个东西只有三种取值情形['systemadmin','entity','supervisor']
+ * @returns {String} 返回Stringified的详细信息对象
+ */
+exports.ReadBond = async (BondId, Actor = 'admin', ActorOrg = 'systemadmin') =>
+{
+    const response = InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'readBond', [BondId], Actor, ActorOrg);
+    return response.result;
+}
+/**
+ * 
+ * @param {String} BondId 债券的唯一标识符
+ * @param {String} Actor 发起者
+ * @param {string} ObjStr stringified之后的债券详细信息对象
+ * @param {String} ActorOrg 用户所属组织，注意这个东西只有三种取值情形['systemadmin','entity','supervisor']
+ * @returns {Boolean} 修改成功则返回true
+ */
+exports.UpdateBond = async (BondId, ObjStr, Actor = 'admin', ActorOrg = 'systemadmin') =>
+{
+    const response = InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'updateBond', [BondId, ObjStr], Actor, ActorOrg);
+    return response.result;
+}
+/**
+ * 
+ * @param {String} BondId 债券的唯一标识符
+ * @param {String} Actor 发起者
+ * @param {String} ActorOrg 用户所属组织，注意这个东西只有三种取值情形['systemadmin','entity','supervisor']
+ * @returns {Boolean} 是否存在的布尔值
+ */
+exports.DeleteBond = async (BondId, Actor = 'admin', ActorOrg = 'systemadmin') =>
+{
+    const response = InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'deleteBond', [BondId], Actor, ActorOrg);
+    return response.result;
+}
+/**
+ * 
+ * @param {String} StartKey 开始键
+ * @param {String} EndKey 结束键
+ * @param {String} Actor 发起者
+ * @param {String} ActorOrg 用户所属组织，注意这个东西只有三种取值情形['systemadmin','entity','supervisor']
+ * @returns {String} Stringified后的查询结果列表
+ */
+exports.QueryAllAssets_by_range = async (StartKey, EndKey, Actor = 'admin', ActorOrg = 'systemadmin') =>
+{
+    const response = InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'queryAllAssets_by_range', [StartKey, EndKey], Actor, ActorOrg);
+    return response.result;
+}
+/**
+ * 可以查询到债券的所有变更记录
+ * @param {String} BondId 债券id
+ * @param {String} Actor 发起者
+ * @param {String} ActorOrg 用户所属组织，注意这个东西只有三种取值情形['systemadmin','entity','supervisor']
+ * @returns {String} Stringified后的查询结果列表
+ */
+exports.QueryHistorybykey = async (BondId, Actor = 'admin', ActorOrg = 'systemadmin') =>
+{
+    const response = InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'queryHistorybykey', [BondId], Actor, ActorOrg);
+    return response.result;
+}
+/**
+ * 
+ * @param {String} queryString 符合mango语法的富查询语句
+ * @param {String} Actor 发起者
+ * @param {String} ActorOrg 发起者隶属组织
+ * @returns Stringified后的查询结果列表
+ */
+exports.GetQueryResultForQueryString = async (queryString, Actor = 'admin', ActorOrg = 'systemadmin') =>
+{
+    const response = InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'getQueryResultForQueryString', [queryString], Actor, ActorOrg);
+    return response.result;
+}
