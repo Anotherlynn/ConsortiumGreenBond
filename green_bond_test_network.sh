@@ -6,7 +6,7 @@ export MICROFAB_CONFIG='{
     "port": 39600,
     "endorsing_organizations":[
         {
-            "name": "system_admin"
+            "name": "systemadmin"
         },
         {
             "name": "supervisor"
@@ -19,7 +19,7 @@ export MICROFAB_CONFIG='{
         {
             "name": "channel1",
             "endorsing_organizations":[
-                "system_admin",
+                "systemadmin",
                 "supervisor",
                 "entity"
             ]
