@@ -5,7 +5,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('request');
 const path = require('path')
-
 const jwt = require('jsonwebtoken')
 
 //create express web-app
@@ -13,7 +12,7 @@ const app = express();
 const router = express.Router();
 
 //get the libraries to call
-var network = require('./network/network.js');
+//var network = require('./network/network.js');
 //var validate = require('./network/validate.js');
 //var analysis = require('./network/analysis.js');
 
