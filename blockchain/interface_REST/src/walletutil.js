@@ -1,4 +1,4 @@
-const { path } = require('path');
+const path = require('path');
 const { buildWallet } = require('./AppUtil.js');
 const { Wallets } = require('fabric-network');
 /**
@@ -18,7 +18,7 @@ exports.IsUserRegisteredByWallet = async (UserName, OrganizationName) =>
     const UserNameentity = await wallet.get(UserName);
     if (UserNameentity)
     {
-        console.log(`An identity for the user ${UserName} exists in the wallet`);
+        console.log(`An identity for the user ${UserName}.${OrganizationName} exists in the wallet`);
         return true;
     }
     return false;

@@ -83,20 +83,21 @@ exports.RegisterUserOnBlockchain = async (UserName, UserOrg, UserPassword) =>
  * @param {String} UserOrg 组织的名称, 注意这个东西只有三种取值情形['systemadmin','entity','supervisor']
  * @return 注册成功返回一个true,否则会抛出异常(如用户已经存在)
  */
- exports.RegisterUserBoth = async (UserName, UserOrg, UserPassword) =>
- {
-    //  if (this.IsUserExist(UserName, UserOrg))
-    //  {
-    //      throw new Error(`用户${UserName}.${UserOrg}已经存在了,不能重复注册`);
-    //  }
-     await this.RegisterUserOnBlockchain(UserName, UserOrg, UserPassword);
-     await this.RegisterUserOnWallet(UserName, UserOrg);
-     return true;
-     //let InitObject = Object();
-     //InitObject.org = OrganizationName.toLocaleLowerCase();
-     //const EmptyObjectString = JSON.stringify(InitObject);
-     //await this.SetUserDetail(UserName,EmptyObjectString);
- }
+exports.RegisterUserBoth = async (UserName, UserOrg, UserPassword) =>
+{
+    const exists = await this.IsUserExist(UserName, UserOrg);
+    if (exists)
+    {
+        throw new Error(`用户${UserName}.${UserOrg}已存在，不能重复注册`);
+    }
+    await this.RegisterUserOnBlockchain(UserName, UserOrg, UserPassword);
+    await this.RegisterUserOnWallet(UserName, UserOrg);
+    return true;
+    //let InitObject = Object();
+    //InitObject.org = OrganizationName.toLocaleLowerCase();
+    //const EmptyObjectString = JSON.stringify(InitObject);
+    //await this.SetUserDetail(UserName,EmptyObjectString);
+}
 
 /**
  * 仅超级管理员调用
@@ -108,10 +109,11 @@ exports.RegisterUserOnBlockchain = async (UserName, UserOrg, UserPassword) =>
  */
 exports.UserLogin = async (UserName, UserOrg, psw) =>
 {
-    // if (!this.IsUserExist(UserName, UserOrg))
-    // {
-    //     throw new Error(`用户${UserName}.${UserOrg}不存在，不能登录`);
-    // }
+    const exists = await this.IsUserExist(UserName, UserOrg);
+    if (!exists)
+    {
+        throw new Error(`用户${UserName}.${UserOrg}不存在，不能登录`);
+    }
     const response = await InvokeTransaction(CHANNELNAME, 'user_contract', 'UserLogin', [UserName, UserOrg, psw], 'admin', 'systemadmin');
     return response.result;
 }
@@ -141,7 +143,7 @@ exports.IsUserExist = async (UserName, UserOrg, Actor = 'admin', ActorOrg = 'sys
 exports.SetUserDetail = async (UserName, UserOrg, StringifiedString, Actor = 'admin', ActorOrg = 'systemadmin') =>
 {
 
-    const response = InvokeTransaction(CHANNELNAME, 'user_contract', 'SetUsetDetail', [UserName, UserOrg, StringifiedString], Actor, ActorOrg);
+    const response = InvokeTransaction(CHANNELNAME, 'user_contract', 'SetUserDetail', [UserName, UserOrg, StringifiedString], Actor, ActorOrg);
     return response.result;
 }
 /**

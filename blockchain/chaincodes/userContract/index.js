@@ -1,4 +1,4 @@
-const userContract = require('./lib/my-asset-contract');
+const userContract = require('./src/contract_src');
 
-module.exports.MyAssetContract = userContract;
+module.exports.userContract = userContract;
 module.exports.contracts = [ userContract ];

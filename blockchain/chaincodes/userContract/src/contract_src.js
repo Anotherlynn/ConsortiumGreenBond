@@ -39,7 +39,7 @@ class UserContract extends Contract
         {
             throw new Error(`密码不能为空`);
         }
-        const buffer = Buffer.from(JSON.stringify(psw));
+        const buffer = Buffer.from(psw);
         await ctx.stub.putState(UserId, buffer);
         return true;
     }
@@ -54,14 +54,14 @@ class UserContract extends Contract
     async UserLogin(ctx, name, org, psw)
     {
         const UserId = userpw_table_prefix + name + '.' + org;
-        const exists = await this.UserExists(ctx, UserId);
+        const exists = await this.UserExists(ctx, name, org);
         if (!exists)
         {
             throw new Error(`用户 ${name} 不存在`);
         }
-        const pw = ctx.stub.getState(UserId);
+        const pw = await ctx.stub.getState(UserId);
         const decode_pw = pw.toString();
-        if (decode_pw === psw)
+        if (psw === decode_pw)
         {
             return true;
         }

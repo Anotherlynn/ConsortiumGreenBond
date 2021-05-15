@@ -77,12 +77,12 @@ exports.registerAndEnrollUser = async (caClient, wallet, orgMspId, userId ) => {
 		const secret = await caClient.register({
 			enrollmentID: userId,
 			role: 'client',
-			attrs: [{ name: 'clientHash', value: userId , ecert: true }],
+			//attrs: [{ name: 'clientHash', value: userId , ecert: true }],
 		}, adminUser);
 		const enrollment = await caClient.enroll({
 			enrollmentID: userId,
 			enrollmentSecret: secret,
-			attr_reqs: [{ name: "clientHash", optional: false }],
+			//attr_reqs: [{ name: "clientHash", optional: false }],
 		});
 		const x509Identity = {
 			credentials: {

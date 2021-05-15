@@ -1,6 +1,6 @@
 {
   "name": "user_contract",
-  "version": "0.0.1",
+  "version": "0.0.7",
   "description": "provide user register and login etc. services.",
   "main": "index.js",
   "engines": {
