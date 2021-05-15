@@ -14,7 +14,6 @@ const { buildCAClient, registerAndEnrollUser, enrollAdmin } = require('./CAUtil'
 const { BuildConnectionFile, buildWallet } = require('./AppUtil');
 const { InvokeTransaction } = require('./InvokeTransactionFcn.js');
 const GlobalVars = require('../global_vars.js');
-//const { response } = require('express');
 const NetWorkName = GlobalVars.NetWorkName;
 const CHANNELNAME = GlobalVars.Channel;
 //logger.level = 'debug';
@@ -53,7 +52,7 @@ exports.RegisterUserOnWallet = async (UserName, OrganizationName) =>
     const wallet = await buildWallet(Wallets, WalletPathString);//基于文件系统的钱包文件
     console.log(`用户${UserName}.${OrganizationName}的钱包应属路径是${WalletPathString},注意尚不知道文件钱包是否存在`);
     const mspID = OrganizationName + 'MSP';//mspID首位没有大写
-    await enrollAdmin(caClient, wallet, mspID);
+    //await enrollAdmin(caClient, wallet, mspID);
     await registerAndEnrollUser(caClient, wallet, mspID, UserName);
     var response =
     {
@@ -72,7 +71,7 @@ exports.RegisterUserOnWallet = async (UserName, OrganizationName) =>
 exports.RegisterUserOnBlockchain = async (UserName, UserOrg, UserPassword) =>
 {
     const response = await InvokeTransaction(CHANNELNAME, 'user_contract', 'UserRegister', [UserName, UserOrg, UserPassword], 'admin', 'systemadmin');
-    return response.result;
+    return response;
 }
 /**
  * 这个是暴露给前后端的
@@ -85,14 +84,11 @@ exports.RegisterUserOnBlockchain = async (UserName, UserOrg, UserPassword) =>
  */
 exports.RegisterUserBoth = async (UserName, UserOrg, UserPassword) =>
 {
-    const exists = await this.IsUserExist(UserName, UserOrg);
-    if (exists)
-    {
-        throw new Error(`用户${UserName}.${UserOrg}已存在，不能重复注册`);
-    }
+    //TODO:返回response还是结果？
     await this.RegisterUserOnBlockchain(UserName, UserOrg, UserPassword);
-    await this.RegisterUserOnWallet(UserName, UserOrg);
-    return true;
+    const response = await this.RegisterUserOnWallet(UserName, UserOrg);
+    console.log('在两个地方成功注册了用户')
+    return response;
     //let InitObject = Object();
     //InitObject.org = OrganizationName.toLocaleLowerCase();
     //const EmptyObjectString = JSON.stringify(InitObject);
@@ -109,13 +105,8 @@ exports.RegisterUserBoth = async (UserName, UserOrg, UserPassword) =>
  */
 exports.UserLogin = async (UserName, UserOrg, psw) =>
 {
-    const exists = await this.IsUserExist(UserName, UserOrg);
-    if (!exists)
-    {
-        throw new Error(`用户${UserName}.${UserOrg}不存在，不能登录`);
-    }
-    const response = await InvokeTransaction(CHANNELNAME, 'user_contract', 'UserLogin', [UserName, UserOrg, psw], 'admin', 'systemadmin');
-    return response.result;
+    const response =  await InvokeTransaction(CHANNELNAME, 'user_contract', 'UserLogin', [UserName, UserOrg, psw], 'admin', 'systemadmin');
+    return response;
 }
 
 /**
@@ -126,8 +117,8 @@ exports.UserLogin = async (UserName, UserOrg, psw) =>
  */
 exports.IsUserExist = async (UserName, UserOrg, Actor = 'admin', ActorOrg = 'systemadmin') =>
 {
-    const response = InvokeTransaction(CHANNELNAME, 'user_contract', 'UserExists', [UserName, UserOrg], Actor, ActorOrg);
-    return response.result;
+    const response = await InvokeTransaction(CHANNELNAME, 'user_contract', 'UserExists', [UserName, UserOrg], Actor, ActorOrg);
+    return response;
 }
 /**
  * 这个函数并非系统管理员调用，有可能是自己调用
@@ -143,8 +134,8 @@ exports.IsUserExist = async (UserName, UserOrg, Actor = 'admin', ActorOrg = 'sys
 exports.SetUserDetail = async (UserName, UserOrg, StringifiedString, Actor = 'admin', ActorOrg = 'systemadmin') =>
 {
 
-    const response = InvokeTransaction(CHANNELNAME, 'user_contract', 'SetUserDetail', [UserName, UserOrg, StringifiedString], Actor, ActorOrg);
-    return response.result;
+    const response = await InvokeTransaction(CHANNELNAME, 'user_contract', 'SetUserDetail', [UserName, UserOrg, StringifiedString], Actor, ActorOrg);
+    return response;
 }
 /**
  * 可以由各种身份的用户调用
@@ -162,8 +153,8 @@ exports.GetUserDatail = async (UserName, UserOrg, Actor = 'admin', ActorOrg = 's
     // {
     //     throw new Error(`用户${UserName}.${UserOrg}不存在,不能获得信息`);
     // }
-    const response = InvokeTransaction(CHANNELNAME, 'user_contract', 'GetUserDetail', [UserName, UserOrg], Actor, ActorOrg);
-    return response.result;
+    const response = await InvokeTransaction(CHANNELNAME, 'user_contract', 'GetUserDetail', [UserName, UserOrg], Actor, ActorOrg);
+    return response;
 }
 
 /**
@@ -175,8 +166,8 @@ exports.GetUserDatail = async (UserName, UserOrg, Actor = 'admin', ActorOrg = 's
  */
 exports.QueryUserByString = async (QueryString, Actor = 'admin', ActorOrg = 'systemadmin') =>
 {
-    const response = InvokeTransaction(CHANNELNAME, 'user_contract', 'QueryUserByString', [QueryString], Actor, ActorOrg);
-    return response.result;
+    const response = await InvokeTransaction(CHANNELNAME, 'user_contract', 'QueryUserByString', [QueryString], Actor, ActorOrg);
+    return response;
 }
 
 
@@ -189,7 +180,7 @@ exports.QueryUserByString = async (QueryString, Actor = 'admin', ActorOrg = 'sys
  */
 exports.BondExists = async (BondId, Actor = 'admin', ActorOrg = 'systemadmin') =>
 {
-    const response = InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'BondExists', [BondId], Actor, ActorOrg);
+    const response = await InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'BondExists', [BondId], Actor, ActorOrg);
     return response.result;
 }
 /**
@@ -202,7 +193,7 @@ exports.BondExists = async (BondId, Actor = 'admin', ActorOrg = 'systemadmin') =
  */
 exports.CreateBondWithObj = async (BondId, ObjStr, Actor = 'admin', ActorOrg = 'systemadmin') =>
 {
-    const response = InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'createBondWithObj', [BondId, ObjStr], Actor, ActorOrg);
+    const response = await InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'createBondWithObj', [BondId, ObjStr], Actor, ActorOrg);
     return response.result;
 }
 /**
@@ -214,7 +205,7 @@ exports.CreateBondWithObj = async (BondId, ObjStr, Actor = 'admin', ActorOrg = '
  */
 exports.ReadBond = async (BondId, Actor = 'admin', ActorOrg = 'systemadmin') =>
 {
-    const response = InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'readBond', [BondId], Actor, ActorOrg);
+    const response = await InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'readBond', [BondId], Actor, ActorOrg);
     return response.result;
 }
 /**
@@ -227,7 +218,7 @@ exports.ReadBond = async (BondId, Actor = 'admin', ActorOrg = 'systemadmin') =>
  */
 exports.UpdateBond = async (BondId, ObjStr, Actor = 'admin', ActorOrg = 'systemadmin') =>
 {
-    const response = InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'updateBond', [BondId, ObjStr], Actor, ActorOrg);
+    const response = await InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'updateBond', [BondId, ObjStr], Actor, ActorOrg);
     return response.result;
 }
 /**
@@ -239,7 +230,7 @@ exports.UpdateBond = async (BondId, ObjStr, Actor = 'admin', ActorOrg = 'systema
  */
 exports.DeleteBond = async (BondId, Actor = 'admin', ActorOrg = 'systemadmin') =>
 {
-    const response = InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'deleteBond', [BondId], Actor, ActorOrg);
+    const response = await InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'deleteBond', [BondId], Actor, ActorOrg);
     return response.result;
 }
 /**
@@ -252,7 +243,7 @@ exports.DeleteBond = async (BondId, Actor = 'admin', ActorOrg = 'systemadmin') =
  */
 exports.QueryAllAssets_by_range = async (StartKey, EndKey, Actor = 'admin', ActorOrg = 'systemadmin') =>
 {
-    const response = InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'queryAllAssets_by_range', [StartKey, EndKey], Actor, ActorOrg);
+    const response = await InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'queryAllAssets_by_range', [StartKey, EndKey], Actor, ActorOrg);
     return response.result;
 }
 /**
@@ -264,7 +255,7 @@ exports.QueryAllAssets_by_range = async (StartKey, EndKey, Actor = 'admin', Acto
  */
 exports.QueryHistorybykey = async (BondId, Actor = 'admin', ActorOrg = 'systemadmin') =>
 {
-    const response = InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'queryHistorybykey', [BondId], Actor, ActorOrg);
+    const response = await InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'queryHistorybykey', [BondId], Actor, ActorOrg);
     return response.result;
 }
 /**
@@ -276,6 +267,6 @@ exports.QueryHistorybykey = async (BondId, Actor = 'admin', ActorOrg = 'systemad
  */
 exports.GetQueryResultForQueryString = async (queryString, Actor = 'admin', ActorOrg = 'systemadmin') =>
 {
-    const response = InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'getQueryResultForQueryString', [queryString], Actor, ActorOrg);
+    const response = await InvokeTransaction(CHANNELNAME, 'greenbond_contract', 'getQueryResultForQueryString', [queryString], Actor, ActorOrg);
     return response.result;
 }

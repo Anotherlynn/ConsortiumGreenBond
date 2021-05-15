@@ -20,7 +20,7 @@ exports.buildCAClient = (FabricCAServices, ConnectionConfigFile, CAName) => {
 	//const caTLSCACerts = caInfo.tlsCACerts.pem;
 	//const caClient = new FabricCAServices(caInfo.url, { trustedRoots: caTLSCACerts, verify: false }, caInfo.caName);
 	const caClient = new FabricCAServices(caInfo.url)
-	console.log(`Built a CA Client named ${caInfo.caName}`);
+	//console.log(`Built a CA Client named ${caInfo.caName}`);
 	return caClient;
 };
 
@@ -30,7 +30,7 @@ exports.enrollAdmin = async (caClient, wallet, orgMspId) => {
 		const identity = await wallet.get(adminUserId);
 
 		if (identity) {
-			console.log(`An identity for the admin user already exists in the wallet in ${orgMspId}`);
+			//console.log(`An identity for the admin user already exists in the wallet in ${orgMspId}`);
 			return;
 		}
 
@@ -45,7 +45,7 @@ exports.enrollAdmin = async (caClient, wallet, orgMspId) => {
 			type: 'X.509',
 		};
 		await wallet.put(adminUserId, x509Identity);
-		console.log('Successfully enrolled admin user and imported it into the wallet');
+		//console.log('Successfully enrolled admin user and imported it into the wallet');
 	} catch (error) {
 		console.error(`Failed to enroll admin user : ${error}`);
 	}

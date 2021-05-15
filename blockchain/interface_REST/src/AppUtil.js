@@ -14,7 +14,7 @@ exports.BuildConnectionFile = (OrgName, FileName) =>
 	// load the common connection configuration file
 	//const ccpPath = path.resolve(__dirname, '..','..','crypto-config', 'peerOrganizations', orgName , fileName);
 	//const ccpPath = path.resolve(__dirname, '..', 'connection.json')
-	console.log(`开始构建往${OrgName}的认证服务器连接文件路径`);
+	//console.log(`开始构建往${OrgName}的认证服务器连接文件路径`);
 	const ccpPath = path.resolve(__dirname, '..', 'connection_cfgs', FileName)
 	const fileExists = fs.existsSync(ccpPath);
 	if (!fileExists) {
@@ -23,7 +23,7 @@ exports.BuildConnectionFile = (OrgName, FileName) =>
 	const contents = fs.readFileSync(ccpPath, 'utf8');
 	// build a JSON object from the file contents
 	const ccp = JSON.parse(contents);
-	console.log(`成功加载连接文件，路径是 ${ccpPath}`);
+	//console.log(`成功加载连接文件，路径是 ${ccpPath}`);
 	return ccp;
 };
 
@@ -36,7 +36,7 @@ exports.buildWallet = async (Wallets, walletPath) =>
 	if (walletPath)
 	{
 		wallet = await Wallets.newFileSystemWallet(walletPath);
-		console.log(`构建基于文件系统的钱包对象，其路径是 ${walletPath}`);
+		//console.log(`构建基于文件系统的钱包对象，其路径是 ${walletPath}`);
 	}
 	else
 	{
