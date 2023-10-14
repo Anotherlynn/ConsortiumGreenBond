@@ -85,42 +85,37 @@ app.post('/api/login', function (req, res)
         });
     
 });
+
 app.post('/api/register', function (req, res)
 {
-    let username = req.body.username;
-    let org = req.body.org;
+
+    console.log('注册用户 收到请求')
     
-})
-// app.post('/api/register', function (req, res)
-// {
+    //前端只需要返回密码和公司,都是String
+    //账户后端随机生成
+    //营业执照暂不处理
+    //完成后，后端会返回注册生成的完整信息
+    var cardid = req.body.cardid;
+    var 公司 = req.body.公司;
+    //print variables
+    //console.log('注册用户 参数-Using param -: ' + ' cardid: ' + cardid + ' 公司: ' + 公司);
 
-//     console.log('注册用户 收到请求')
-//     //前端只需要返回密码和公司,都是String
-//     //账户后端随机生成
-//     //营业执照暂不处理
-//     //完成后，后端会返回注册生成的完整信息
-//     var cardid = req.body.cardid;
-//     var 公司 = req.body.公司;
+    //network.注册用户(cardid, 公司)
+        .then((response) =>
+        {
+            //return error if error in response
+            if (response.error != null)
+            {
+                res.json({
+                    error: response.error
+                });
+            } else
+            {
+                //else return success
+                res.json({
+                    success: response
+                });
+            }
+        });
 
-//     //print variables
-//     //console.log('注册用户 参数-Using param -: ' + ' cardid: ' + cardid + ' 公司: ' + 公司);
-
-//     //network.注册用户(cardid, 公司)
-//         .then((response) =>
-//         {
-//             //return error if error in response
-//             if (response.error != null)
-//             {
-//                 res.json({
-//                     error: response.error
-//                 });
-//             } else
-//             {
-//                 //else return success
-//                 res.json({
-//                     success: response
-//                 });
-//             }
-//         });
-
-// });
+});

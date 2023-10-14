@@ -75,7 +75,7 @@ class GreenBondContract extends Contract
     }
 
     /**
-     * 
+     * 删除债券。如果债券不存在，则应抛出错误
      * @param {Context} ctx 对象接口
      * @param {String} BondId 债券唯一标识符
      * @returns 如果删掉了就返回true，出了问题就报错
@@ -131,7 +131,7 @@ class GreenBondContract extends Contract
         }
     }
     /**
-     * 
+     * 根据键查询所有针对该债券的历史操作
      * @param {Context} ctx 对象接口
      * @param {String} BondId 债券唯一标识符
      * @returns {String} 返回Stringify之后的JSON查询结果，所以要注意在外Parse
