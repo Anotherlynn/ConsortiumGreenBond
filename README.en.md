@@ -1,7 +1,7 @@
-# to_build
-
+# ConsortiumGreenBond
+—————————————————————————————————————————————————————
 #### Description
-{**When you're done, you can delete the content in this README and update the file with details for others getting started with your repository**}
+{**ConsortiumGreenBond is a comprehensive system for managing green bonds, built on HyperLegder Fabric Framework.<br>During the management process of green bonds, it is necessary to grasp the detailed movements of all funds of a bond while ensuring they are readily accessible at any time. For every transaction that occurs with the funds contained in the bond, a judgment must be made as to whether it is 'green' or 'non-green'. Traditional green bond management systems have high (labor) costs and long verification processes, and the traceability of fund movements is not very good. This system leverages the features of blockchain technology, putting all green bond information on a consortium blockchain (Hyperledger Fabric) to achieve analysis and processing of fund movements, ensuring every bond is traceable and can be visualized.**}
 
 #### Software Architecture
 Software architecture description
